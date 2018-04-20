@@ -1,1 +1,1 @@
-web: StundenzettelCreator.wsgi
+web: gunicorn StundenzettelCreator.wsgi
