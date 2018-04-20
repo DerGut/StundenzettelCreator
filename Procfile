@@ -1,0 +1,1 @@
+web: StundenzettelCreator.wsgi
