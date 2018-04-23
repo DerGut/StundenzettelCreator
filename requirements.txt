@@ -6,3 +6,4 @@ gunicorn==19.7.1
 reportlab
 xhtml2pdf>=0.2b1
 django-easy-pdf
+celery==4.1.0
