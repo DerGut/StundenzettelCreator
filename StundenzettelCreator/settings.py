@@ -124,6 +124,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
+# Deploy stuff
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+
 # Activate Django-Heroku.
 if os.environ.get('HEROKU', False):
     import django_heroku
