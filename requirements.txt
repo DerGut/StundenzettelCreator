@@ -7,3 +7,4 @@ reportlab
 xhtml2pdf>=0.2b1
 django-easy-pdf
 celery==4.1.0
+redis==2.10.6
