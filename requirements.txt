@@ -3,6 +3,8 @@ psycopg2==2.7.1
 psycopg2-binary==2.7.4
 django_heroku==0.3.1
 gunicorn==19.7.1
-reportlab
+reportlab==3.4.0
 xhtml2pdf>=0.2b1
-django-easy-pdf
+django-easy-pdf==0.1.1
+holidays==0.9.4
+numpy==1.14.2

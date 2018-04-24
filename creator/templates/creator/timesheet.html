@@ -1,0 +1,132 @@
+{% extends "easy_pdf/base.html" %}
+
+{% load static %}
+
+{% block extra_style %}
+    <style type="text/css">
+        #details {
+            margin-left: 10px;
+            margin-bottom: 30px;
+        }
+
+        #details table {
+            table-layout: fixed;
+            font-size: 11px;
+        }
+
+        #details tr {
+            padding-top: 4px;
+        }
+
+        .fill-out {
+            border-bottom: 1px solid grey;
+        }
+
+        #timesheet td {
+            text-align: center;
+            border: 1px solid grey;
+            padding-top: 2px;
+        }
+
+        #timesheet {
+            margin-bottom: 50px;
+        }
+
+        #underline-row td {
+            border: none;
+            font-weight: bold;
+        }
+
+        #signatures {
+            text-align: center;
+            vertical-align: top;
+        }
+
+        .signature-field {
+            border-top: 1px solid grey;
+            padding-top: 2px;
+            vertical-align: top;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <div id="content">
+        <div id="details">
+            <h1>Erfassung der geleisteten Arbeitszeiten</h1>
+            <table>
+                <tr>
+                    <td>Name, Vorname der Hilfskraft:</td>
+                    <td class="fill-out">{{ details.name }}, {{ details.first_name }}</td>
+                </tr>
+                <tr>
+                    <td>Fachbereich/Organisationseinheit:</td>
+                    <td class="fill-out">{{ details.unit_of_organisation }}</td>
+                </tr>
+                <tr>
+                    <td>Monat/Jahr:</td>
+                    <td class="fill-out">{{ header_date }}</td>
+                </tr>
+                <tr>
+                    <td>Monatsarbeitszeit laut Arbeitsvertrag:</td>
+                    <td class="fill-out">{{ details.hours }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <table id="timesheet">
+            <thead>
+            <tr>
+                <td style="text-align: left;padding-left: 5px">Kalender- tag</td>
+                <td style="text-align: left;padding-left: 5px">Beginn (Uhrzeit)</td>
+                <td style="text-align: left;padding-left: 5px">Pause (Dauer)</td>
+                <td style="text-align: left;padding-left: 5px">Ende (Uhrzeit)</td>
+                <td style="text-align: left;padding-left: 5px">Dauer (Summe)</td>
+                <td style="text-align: left;padding-left: 5px">aufgezeichnet am:</td>
+                <td style="text-align: left;padding-left: 5px">Bemerkungen</td>
+            </tr>
+            </thead>
+            <tbody>
+            {% for day in data %}
+                <tr>
+                    <td style="text-align: left;padding-left: 5px">{{ day.day }}</td>
+                    <td>{{ day.start }}</td>
+                    <td></td>
+                    <td>{{ day.end }}</td>
+                    <td>{{ day.duration }}</td>
+                    <td>{{ day.date }}</td>
+                    <td></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td style="width: 130px;font-weight: bold">Summe</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>{{ total_hours }}</td>
+                <td style="width: 200px"></td>
+                <td style="width: 400px"></td>
+            </tr>
+            <tr id="underline-row">
+                <td colspan="4"></td>
+                <td>=======</td>
+                <td colspan="2"></td>
+            </tr>
+            </tfoot>
+        </table>
+
+        <table id="signatures" style="table-layout: fixed">
+            <tr>
+                <td class="signature-field">Datum, Unterschrift der Hilfskraft</td>
+                <td style="width: 30px"></td>
+                <td class="signature-field">
+                    Datum, Unterschrift der Leiterin/ des Leiters des OE<br/>
+                    alternativ: Vorgesetzte/ Vorgesetzter</td>
+            </tr>
+        </table>
+
+    </div>
+{% endblock %}
