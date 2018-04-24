@@ -6,7 +6,6 @@ from django.core.exceptions import ValidationError
 today = datetime.date.today()
 defaults = {
     'hours': 23,
-    'unit_of_organisation': '<your organisation>',
     'days_of_week': [0, 1, 2, 3, 4],
     'start_hour': 8,
     'end_hour': 18,
@@ -24,7 +23,7 @@ class DetailsForm(forms.Form):
     name = forms.CharField(help_text='Name of the employee')
     first_name = forms.CharField(help_text='First name of the employee')
     hours = forms.IntegerField(required=False, initial=defaults['hours'])
-    unit_of_organisation = forms.CharField(required=False, initial=defaults['unit_of_organisation'])
+    unit_of_organisation = forms.CharField()
 
     # Advanced details
     first_day_of_month = forms.DateField(

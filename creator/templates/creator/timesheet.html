@@ -4,6 +4,19 @@
 
 {% block extra_style %}
     <style type="text/css">
+        @page {
+            margin: 0;
+
+            @frame content {
+                -pdf-frame-content: content;
+                margin: 2.5cm;
+            }
+        }
+
+        #logo {
+            width: 250px;
+        }
+
         #details {
             margin-left: 10px;
             margin-bottom: 30px;
@@ -11,7 +24,7 @@
 
         #details table {
             table-layout: fixed;
-            font-size: 11px;
+            font-size: 12px;
         }
 
         #details tr {
@@ -50,9 +63,16 @@
     </style>
 {% endblock %}
 
-{% block content %}
+{% block page_header %}
+    <div id="page_header">
+        {% load static %}
+        <img src="{% static "creator/img/logo_uni_osnabrueck_bw.png" %}" id="logo">
+    </div>
+{% endblock %}
 
+{% block content %}
     <div id="content">
+        .
         <div id="details">
             <h1>Erfassung der geleisteten Arbeitszeiten</h1>
             <table>
