@@ -1,3 +1,7 @@
 .nav-wrapper .brand-logo {
     margin-left: 20px;
 }
+
+#nav-mobile li:last-child {
+    padding-right: 10px;
+}

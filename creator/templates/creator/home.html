@@ -1,10 +1,12 @@
 {% extends "creator/base.html" %}
 
 {% block container %}
-    <h3>Fill out your details:</h3>
+    <h2>Employee details</h2>
+
+    <br/>
 
     <div class="row">
-        <div class="col l9">
+        <div class="col s 12 l9">
             <form method="post" class="details-form">
                 {% csrf_token %}
 
@@ -16,9 +18,9 @@
                         {{ form.first_name }}
                     </div>
                     <div class="col s12 l6 .input-field">
-                        {{ form.name.errors }}
-                        {{ form.name.label_tag }}
-                        {{ form.name }}
+                        {{ form.surname.errors }}
+                        {{ form.surname.label_tag }}
+                        {{ form.surname }}
                     </div>
                 </div>
 
@@ -45,7 +47,7 @@
                     </li>
                 </ul>
 
-                <button type="submit" class="waves-effect waves-light btn">Save</button>
+                <button type="submit" class="waves-effect waves-light btn">Create!</button>
             </form>
         </div>
     </div>

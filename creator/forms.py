@@ -28,7 +28,7 @@ defaults = {
 
 class DetailsForm(forms.Form):
     # Important details
-    name = forms.CharField(
+    surname = forms.CharField(
         widget=forms.TextInput(attrs={'placeholder': '<your name>'})
     )
     first_name = forms.CharField(
