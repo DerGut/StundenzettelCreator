@@ -16,6 +16,7 @@ class DateRangeField(BaseTemporalField):
     }
 
     def to_python(self, value):
+        """Takes the raw form input and translates it to two python datetime objects"""
         # If any of (None, '', [], (), {})
         if value in self.empty_values:
             return None
@@ -30,4 +31,5 @@ class DateRangeField(BaseTemporalField):
         return date1, date2
 
     def strptime(self, value, format):
+        """Overwrites the builtin to parse a datetime out of str"""
         return datetime.datetime.strptime(force_str(value), format).date()

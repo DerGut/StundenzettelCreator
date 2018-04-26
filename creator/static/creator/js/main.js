@@ -1,13 +1,13 @@
 $(document).ready(function(){
-    $('.daterangepicker').flatpickr({
+    $(".daterangepicker").flatpickr({
         altInput: true,
         altFormat: "F j",
         dateFormat: "Y-m-d",
         mode: "range"
     });
-    $('.collapsible').collapsible();
+    $(".collapsible").collapsible();
 
-    $('.show-advanced').click(function () {
-        $('.advanced-fields').css('display', 'block');
+    $(".show-advanced").click(function () {
+        $(".advanced-fields").css("display", "block");
     });
 });
