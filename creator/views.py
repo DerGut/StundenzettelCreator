@@ -29,11 +29,10 @@ def weighted_choice(choices):
     return c, w
 
 
+# TODO: Take this logic out of views.py
 def generate_timesheet_data(details):
     """
-    By Patrick Faion
-    :param details:
-    :return:
+    By Patrick Faion <https://github.com/pfaion/timesheet_generator>
     """
     year = details['year']
     month = details['month']
