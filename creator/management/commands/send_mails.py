@@ -3,6 +3,7 @@ import logging
 
 from django.core import mail
 from django.core.management.base import BaseCommand, CommandError  # TODO: Lookup where to use command errors
+from django.template.loader import render_to_string
 from easy_pdf.rendering import render_to_pdf
 
 from creator import forms
@@ -53,24 +54,27 @@ class Command(BaseCommand):
         """Send email with pdf as attachment"""
 
         subject = "StundenzettelCreator - Your monthly timesheet"
-        message = """
+
+        text_content = """
         Hey {first_name},
         
-        here is your monthly timesheet from <a href='stundenzettel-creator.xyz'>StundenzettelCreator</a>.
+        here is your monthly timesheet from StundenzettelCreator.
         
         Bye 
         """.format(first_name=subscription.first_name)
+        html_content = render_to_string('creator/email_subscription.html', {'context': subscription})
+
         from_email = "subscription@stundenzettel-creator.xyz"
         recipient_list = [subscription.email]
 
-        email = mail.EmailMessage(
+        email = mail.EmailMultiAlternatives(
             subject=subject,
-            body=message,
+            body=text_content,
             from_email=from_email,
             to=recipient_list,
             attachments=[('filename', pdf, 'application/pdf')],
-
         )
+        email.attach_alternative(html_content, 'text/html')
 
         return email
 
