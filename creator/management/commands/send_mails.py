@@ -44,7 +44,8 @@ class Command(BaseCommand):
         num_subscriptions = subscriptions.count()
         if num_subscriptions > 0:
             logger.info('Sent off {} mails successfully'.format(mails_sent))
-            logger.error('Failed to send {} mails'.format(subscriptions.count()))
+            if num_subscriptions - mails_sent > 0:
+                logger.error('Failed to send {} mails'.format(num_subscriptions - mails_sent))
         else:
             logger.info('No subscriptions found')
 
