@@ -1,4 +1,32 @@
+import calendar
+import datetime
+
 from django.db import models
+
+
+def next_month(original_day):
+    """Computes the same day as first_send_date of the next month or the last day of month if it is shorter"""
+    today = datetime.datetime.today()
+    if today.month == 12:
+        last_day_of_next_month = calendar.monthrange(year=today.year+1, month=1)[1]
+    else:
+        last_day_of_next_month = calendar.monthrange(year=today.year, month=today.month+1)[1]
+
+    # Decide whether to use the same day as first_send_date next month or the last_day_of_next_month
+    if original_day <= last_day_of_next_month:
+        day = original_day
+    else:
+        day = last_day_of_next_month
+
+    # Get the next month + year
+    if today.month == 12:
+        year = today.year + 1
+        month = 1
+    else:
+        year = today.year
+        month = today.month + 1
+
+    return datetime.datetime(year=year, month=month, day=day)  #.strftime('%Y-%m-%d')
 
 
 class Subscription(models.Model):
@@ -9,6 +37,10 @@ class Subscription(models.Model):
     unit_of_organisation = models.CharField(max_length=250)
     name = models.CharField(max_length=300)
     first_name = models.CharField(max_length=200)
+
+    def update_to_next_month(self):
+        self.next_send_date = next_month(self.first_send_date.day)
+        self.save()
 
     def __str__(self):
         return '{} - day {}'.format(self.email, self.next_send_date)

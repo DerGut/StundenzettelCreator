@@ -1,9 +1,8 @@
-import calendar
 import datetime
 import logging
 
 from django.core import mail
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand, CommandError  # TODO: Lookup where to use command errors
 from easy_pdf.rendering import render_to_pdf
 
 from creator import forms
@@ -21,10 +20,6 @@ class Command(BaseCommand):
 
         # Set current datetime and get length of next month
         self.today = datetime.datetime.today()
-        if self.today.month == 12:
-            self.last_day_of_next_month = calendar.monthrange(year=self.today.year+1, month=1)[1]
-        else:
-            self.last_day_of_next_month = calendar.monthrange(year=self.today.year, month=self.today.month+1)[1]
 
     def handle(self, *args, **options):
         logger.info("Starting to send todays email subscriptions")
@@ -38,7 +33,7 @@ class Command(BaseCommand):
 
             # TODO: Improve this somehow such that each subscription won't need its own database access
             # Update the subscription to have a mail sent next month again
-            Subscription.objects.get(pk=subscription.pk).update(self.next_month(subscription))
+            subscription.update_to_next_month()
 
         # Send off the actual mails
         connection = mail.get_connection()
@@ -97,23 +92,3 @@ class Command(BaseCommand):
         }
 
         return render_to_pdf(template='creator/timesheet.html', context=context)
-
-    def next_month(self, subscription):
-        """Computes the same day as first_send_date of the next month or the last day of month if it is shorter"""
-
-        # Decide whether to use the same day as first_send_date next month or the last_day_of_next_month
-        if subscription.first_send_date.day <= self.last_day_of_next_month:
-            day = subscription.first_send_date.day
-        else:
-            day = self.last_day_of_next_month
-
-        # Get the next month + year
-        if self.today.month == 12:
-            year = self.today.year + 1
-            month = 1
-        else:
-            year = self.today.year
-            month = self.today.month + 1
-
-        return datetime.datetime(year=year, month=month, day=day)
-
