@@ -56,9 +56,11 @@ class Command(BaseCommand):
         message = """
         Hey {first_name},
         
+        here is your monthly timesheet from <a href='stundenzettel-creator.xyz'>StundenzettelCreator</a>.
         
+        Bye 
         """.format(first_name=subscription.first_name)
-        from_email = ""
+        from_email = "subscription@stundenzettel-creator.xyz"
         recipient_list = [subscription.email]
 
         email = mail.EmailMessage(
