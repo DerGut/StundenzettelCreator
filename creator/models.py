@@ -26,7 +26,13 @@ def next_month(original_day):
         year = today.year
         month = today.month + 1
 
-    return datetime.datetime(year=year, month=month, day=day)  #.strftime('%Y-%m-%d')
+    return datetime.datetime(year=year, month=month, day=day)
+
+
+class SubscriptionManager(models.Manager):
+    def todays(self):
+        """Returns a QuerySet of all subscriptions which next send date is due today"""
+        return super().get_queryset().filter(next_send_date__exact=datetime.datetime.today())
 
 
 class Subscription(models.Model):
@@ -37,6 +43,8 @@ class Subscription(models.Model):
     unit_of_organisation = models.CharField(max_length=250)
     name = models.CharField(max_length=300)
     first_name = models.CharField(max_length=200)
+
+    objects = SubscriptionManager()
 
     def update_to_next_month(self):
         self.next_send_date = next_month(self.first_send_date.day)

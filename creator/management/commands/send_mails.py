@@ -24,7 +24,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         logger.info("Starting to send todays email subscriptions")
-        subscriptions = Subscription.objects.filter(next_send_date__exact=self.today)
+
+        # Get subscriptions which next send date is today
+        subscriptions = Subscription.objects.todays()
 
         emails = []
         for subscription in subscriptions:
