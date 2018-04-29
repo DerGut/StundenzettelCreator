@@ -8,6 +8,7 @@ from easy_pdf.views import PDFTemplateView
 import holidays
 
 from creator.forms import DetailsForm, SubscriptionForm
+from creator.models import Subscription
 
 
 def format_timedelta(td):
@@ -144,7 +145,20 @@ class DetailsFormView(FormView):
 class SubscriptionFormView(FormView):
     template_name = 'creator/subscribe.html'
     form_class = SubscriptionForm
-    success_url = '/subscribe/'
+    success_url = '/success/'
+
+    def form_valid(self, form):
+        Subscription.objects.create(
+            email=form.email,
+            first_send_date=form.first_send_date,
+            next_send_date=form.first_send_date,
+            hours=form.hours,
+            unit_of_organisation=form.unit_of_organisation,
+            first_name=form.first_name,
+            surname=form.surname
+        )
+
+        return super().form_valid(form)
 
 
 class ResultPdfView(PDFTemplateView):

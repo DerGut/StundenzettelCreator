@@ -22,7 +22,7 @@ class Subscription(models.Model):
     next_send_date = models.DateField()
     hours = models.IntegerField()
     unit_of_organisation = models.CharField(max_length=250)
-    name = models.CharField(max_length=300)
+    surname = models.CharField(max_length=300)
     first_name = models.CharField(max_length=200)
 
     objects = SubscriptionManager()
