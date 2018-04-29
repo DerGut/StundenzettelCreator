@@ -8,3 +8,4 @@ xhtml2pdf>=0.2b1
 django-easy-pdf==0.1.1
 holidays==0.9.4
 numpy==1.14.2
+freezegun==0.3.10
