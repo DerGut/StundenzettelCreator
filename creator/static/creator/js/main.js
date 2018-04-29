@@ -1,4 +1,5 @@
 $(document).ready(function(){
+    $(".datepicker").flatpickr({});
     $(".daterangepicker").flatpickr({
         altInput: true,
         altFormat: "F j",
@@ -6,8 +7,4 @@ $(document).ready(function(){
         mode: "range"
     });
     $(".collapsible").collapsible();
-
-    $(".show-advanced").click(function () {
-        $(".advanced-fields").css("display", "block");
-    });
 });

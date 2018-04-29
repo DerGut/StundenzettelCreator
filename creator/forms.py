@@ -97,3 +97,12 @@ class DetailsForm(forms.Form):
         cleaned_data['start_hour'] = defaults['start_hour']
         cleaned_data['end_hour'] = defaults['end_hour']
         cleaned_data['max_hours'] = defaults['max_hours']
+
+
+class SubscriptionForm(DetailsForm):
+    first_send_date = forms.DateField(
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'datepicker',
+        })
+    )

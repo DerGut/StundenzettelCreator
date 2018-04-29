@@ -7,7 +7,7 @@ from django.views.generic.edit import FormView
 from easy_pdf.views import PDFTemplateView
 import holidays
 
-from creator.forms import DetailsForm
+from creator.forms import DetailsForm, SubscriptionForm
 
 
 def format_timedelta(td):
@@ -139,6 +139,12 @@ class DetailsFormView(FormView):
         self.request.session['details'] = form.cleaned_data
 
         return super(DetailsFormView, self).form_valid(form)
+
+
+class SubscriptionFormView(FormView):
+    template_name = 'creator/subscribe.html'
+    form_class = SubscriptionForm
+    success_url = '/subscribe/'
 
 
 class ResultPdfView(PDFTemplateView):
