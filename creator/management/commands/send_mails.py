@@ -1,8 +1,7 @@
-import datetime
 import logging
 
 from django.core import mail
-from django.core.management.base import BaseCommand, CommandError  # TODO: Lookup where to use command errors
+from django.core.management.base import BaseCommand
 from django.template.loader import render_to_string
 from easy_pdf.rendering import render_to_pdf
 
@@ -15,12 +14,6 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     help = 'Looks up all mail subscriptions in the DB, generates the corresponding PDF and sends off an email'
-
-    def __init__(self):
-        super().__init__()
-
-        # Set current datetime and get length of next month
-        self.today = datetime.datetime.today()
 
     def handle(self, *args, **options):
         logger.info("Starting to send todays email subscriptions")
@@ -52,7 +45,8 @@ class Command(BaseCommand):
         else:
             logger.info('No subscriptions found')
 
-    def new_email(self, subscription, pdf):
+    @classmethod
+    def new_email(cls, subscription, pdf):
         """Send email with pdf as attachment"""
 
         subject = "StundenzettelCreator - Your monthly timesheet"
@@ -80,13 +74,14 @@ class Command(BaseCommand):
 
         return email
 
-    def generate_pdf(self, subscription):
+    @classmethod
+    def generate_pdf(cls, subscription):
         details = forms.defaults
         details.update({
             'name': subscription.name,
             'first_name': subscription.first_name,
-            'year': self.today.year,
-            'month': self.today.month,
+            'year': subscription.next_send_date.year,
+            'month': subscription.next_send_date.month,
             'hours': subscription.hours,
             'unit_of_organisation': subscription.unit_of_organisation,
         })
