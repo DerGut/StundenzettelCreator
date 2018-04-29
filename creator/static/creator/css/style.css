@@ -1,0 +1,13 @@
+.nav-wrapper .brand-logo {
+    margin-left: 20px;
+}
+
+#nav-mobile li:last-child {
+    padding-right: 10px;
+}
+
+.github-icon {
+    vertical-align: middle;
+    margin-right: 8px;
+    margin-bottom: 3px;
+}

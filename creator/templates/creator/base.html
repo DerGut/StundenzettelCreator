@@ -1,0 +1,41 @@
+{% load static %}
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="{% static "creator/css/style.css" %}">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="nav-wrapper grey lighten-5">
+                <a href="#" class="brand-logo blue-grey-text text-darken-3">StundenzettelCreator</a>
+                <ul id="nav-mobile" class="right hide-on-med-and-down">
+                    <li>
+                        <a target="_blank" href="http://github.com/DerGut/StundenzettelCreator" class="blue-grey-text text-darken-3">
+                            <img class="github-icon" src="{% static "creator/img/logo_github.png" %}">GitHub
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            {% block container %}
+
+            {% endblock %}
+        </div>
+    </main>
+
+    <footer class="page-footer grey lighten-5"></footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script type="text/javascript" src="{% static "creator/js/main.js" %}"></script>
+</body>
