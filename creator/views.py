@@ -3,8 +3,9 @@ import datetime
 import logging
 import random
 
+import itsdangerous
 import numpy as np
-from django.core import signing
+from django.conf import settings
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import DetailView
 from django.views.generic.edit import FormView
@@ -178,26 +179,43 @@ class SuccessView(DetailView):
         )
 
 
-def unsubscribe(request, hash):
-    signer = signing.Signer()
+def unsubscribe(request, token):
+    signer = itsdangerous.URLSafeTimedSerializer(secret_key=settings.SECRET_KEY)
+    max_age = 60 * 60 * 24 * 7  # Seven days till the link expires
+
     try:
-        id = signer.unsign(hash)
-        Subscription.objects.get(pk=id).delete()
+        subscription_id = signer.loads(token, max_age=max_age)
+        # TODO: except no subscription found -> already unsubscribed?
+        Subscription.objects.get(pk=subscription_id).delete()
         context = {
             'status': 'success',
         }
-    except signing.BadSignature:
+    except itsdangerous.SignatureExpired:
         context = {
-            'status': 'failed',
-            'reason': 'This link is not working properly.'
+            'status': 'failure',
+            'reason': 'expired'
         }
-        logger.error('Tampering with unsubscribe link detected')
-    except:
+        logger.warning('Unsubscribe link expired')
+    except itsdangerous.BadTimeSignature as e:
+        logger.error('Wrong signature format [{}]: {}'.format(e, token))
         context = {
-            'status': 'failed',
-            'reason': 'unknown'
+            'status': 'failure',
+            'reason': 'tampered'
         }
+    except itsdangerous.BadSignature as e:
+        context = {
+            'status': 'failure',
+            'reason': 'tampered'
+        }
+        logger.error('Tampering with unsubscribe link detected [{}]: {}'.format(e, token))
 
+        encoded_payload = e.payload
+        if encoded_payload is not None:
+            try:
+                decoded_payload = signer.load_payload(encoded_payload)
+                logger.error('Payload was {}'.format(decoded_payload))
+            except itsdangerous.BadData:
+                pass
 
     return render(request, 'creator/subscription_unsubscribe.html', context=context)
 

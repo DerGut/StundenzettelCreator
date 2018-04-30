@@ -12,9 +12,6 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 
-import logging
-logging.basicConfig(level=logging.INFO)
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -25,8 +22,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if os.environ.get('DEBUG') == 'True':
-    DEBUG = True
+DEBUG = os.environ.get('DEBUG', False) == 'True'
+
+import logging
+# if DEBUG:
+#     logging.basicConfig(level=logging.DEBUG)
+# else:
+logging.basicConfig(level=logging.INFO)
+
 
 ALLOWED_HOSTS = []
 
@@ -143,3 +146,8 @@ X_FRAME_OPTIONS = 'DENY'
 if os.environ.get('HEROKU', False):
     import django_heroku
     django_heroku.settings(locals())
+
+if DEBUG:
+    HOST_NAME = '127.0.0.1:8000'
+else:
+    HOST_NAME = 'http://www.stundenzettel-creator.xyz'

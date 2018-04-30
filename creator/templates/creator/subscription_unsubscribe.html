@@ -3,9 +3,17 @@
 {% block container %}
     {% if status == 'success' %}
         <h3>Success</h3>
-        <p>You successfully unsubscribed.</p>
-    {% else %}
-        <h3>We are sorry, something went wrong.</h3>
-        <p>Please try visiting {% url 'unsubscribe' %}</p>
+        <p>You unsubscribed successfully.</p>
+    {% elif status == 'failure' %}
+        {% if reason == 'expired' %}
+            <h3>Your link has expired</h3>
+            {# TODO: offer to send a new link to email address #}
+        {% elif reason == 'tampered' %}
+            <h3>Your link has been tampered with</h3>
+            {# TODO: offer to send a new link to email address #}
+        {% else %}
+            <h3>We are sorry, something went wrong.</h3>
+            {# TODO: offer to send a new link to email address #}
+        {% endif %}
     {% endif %}
 {% endblock %}

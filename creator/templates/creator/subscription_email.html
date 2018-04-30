@@ -5,11 +5,16 @@
     <title>Title</title>
 </head>
 <body>
-    Hey {{ first_name }},
+<p>
+    Hey {{ subscription.first_name }},
+</p>
 
-    <p>here is your monthly timesheet from <a href="http://www.stundenzettel-creator.xyz">StundenzettelCreator</a>.
-    You can always unsubscribe by visiting <a href="{% url 'unsubscribe' hash %}">unsubscribe</a></p>
 
-    <p>Bye</p>
+<p>
+    here is your monthly timesheet from <a href="{{ host }}">StundenzettelCreator</a>.
+    You can always unsubscribe by visiting <a href="{{ host }}{% url 'unsubscribe' token %}">unsubscribe</a>
+</p>
+
+<p>Bye</p>
 </body>
 </html>

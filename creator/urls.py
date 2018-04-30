@@ -1,11 +1,11 @@
 from django.conf.urls import url
 
-from creator.views import DetailsFormView, ResultPdfView, SubscriptionFormView, SuccessView, UnsubscribeView
+from creator import views
 
 urlpatterns = [
-    url(r'^$', DetailsFormView.as_view(), name='index'),
-    url(r'^result/', ResultPdfView.as_view(), name='result'),
-    url(r'^subscribe/', SubscriptionFormView.as_view(), name='subscribe'),
-    url(r'^success/', SuccessView.as_view(), name='success'),
-    url(r'^unsubscribe/(?P<hash>[*]{32})/', UnsubscribeView.as_view(), name='unsubscribe')
+    url(r'^$', views.DetailsFormView.as_view(), name='index'),
+    url(r'^result', views.ResultPdfView.as_view(), name='result'),
+    url(r'^subscribe', views.SubscriptionFormView.as_view(), name='subscribe'),
+    url(r'^success', views.SuccessView.as_view(), name='success'),
+    url(r'^unsubscribe/(?P<token>[\w.\-]+)', views.unsubscribe, name='unsubscribe')
 ]

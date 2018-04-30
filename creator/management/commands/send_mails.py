@@ -1,11 +1,12 @@
 import logging
 
+import itsdangerous
 from django.core import mail
 from django.core.management.base import BaseCommand
-from django.core.signing import Signer
 from django.template.loader import render_to_string
 from easy_pdf.rendering import render_to_pdf
 
+from StundenzettelCreator import settings
 from creator import forms
 from creator.models import Subscription
 from creator.views import generate_timesheet_data
@@ -19,7 +20,7 @@ class Command(BaseCommand):
     def __init__(self):
         super().__init__()
 
-        self.signer = Signer()
+        self.signer = itsdangerous.URLSafeTimedSerializer(secret_key=settings.SECRET_KEY)
 
     def handle(self, *args, **options):
         logger.info("Starting to send todays email subscriptions")
@@ -53,25 +54,38 @@ class Command(BaseCommand):
 
     def new_email(self, subscription, pdf):
         """Send email with pdf as attachment"""
-
         subject = "StundenzettelCreator - Your monthly timesheet"
 
-        unsubscribe_hash = self.signer.sign(subscription.pk)
+        unsubscribe_hash = self.signer.dumps(subscription.pk)
+        logger.debug('Created hash {}'.format(unsubscribe_hash))
+        # unsubscribe_hash = unsubscribe_hash.split(".")
 
         text_content = """
         Hey {first_name},
         
         here is your monthly timesheet from StundenzettelCreator.
         
-        You can always unsubscribe with this link: http://stundenzettel-creator/unsubscribe/{hash}
+        You can always unsubscribe with this link: {host}/unsubscribe/{token}
         
         Bye 
-        """.format(first_name=subscription.first_name, hash=unsubscribe_hash)
+        """.format(
+            first_name=subscription.first_name,
+            host=settings.HOST_NAME,
+            token=unsubscribe_hash,
+            hash1=unsubscribe_hash[0],
+            hash2=unsubscribe_hash[1],
+            hash3=unsubscribe_hash[2]
+        )
+
         html_content = render_to_string(
             'creator/subscription_email.html',
             context={
                 'subscription': subscription,
-                'hash': unsubscribe_hash
+                'host': settings.HOST_NAME,
+                'token': unsubscribe_hash,
+                'hash1': unsubscribe_hash[0],
+                'hash2': unsubscribe_hash[1],
+                'hash3': unsubscribe_hash[2]
             })
 
         from_email = "subscription@stundenzettel-creator.xyz"
