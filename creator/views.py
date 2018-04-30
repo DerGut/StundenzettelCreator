@@ -75,6 +75,7 @@ def generate_timesheet_data(details):
     h = details['hours']
     while h > 0:
         if len(possible_days) == 0:
+            # TODO: Handle this somehow differently - signal the user (pass subscription on to the next day etc)
             raise RuntimeError("Could not work off all hours with given parameters!")
         # select day
         day, weight = weighted_choice(zip(possible_days, weights))

@@ -58,7 +58,6 @@ class Command(BaseCommand):
 
         unsubscribe_hash = self.signer.dumps(subscription.pk)
         logger.debug('Created hash {}'.format(unsubscribe_hash))
-        # unsubscribe_hash = unsubscribe_hash.split(".")
 
         text_content = """
         Hey {first_name},
@@ -72,9 +71,6 @@ class Command(BaseCommand):
             first_name=subscription.first_name,
             host=settings.HOST_NAME,
             token=unsubscribe_hash,
-            hash1=unsubscribe_hash[0],
-            hash2=unsubscribe_hash[1],
-            hash3=unsubscribe_hash[2]
         )
 
         html_content = render_to_string(
@@ -83,9 +79,6 @@ class Command(BaseCommand):
                 'subscription': subscription,
                 'host': settings.HOST_NAME,
                 'token': unsubscribe_hash,
-                'hash1': unsubscribe_hash[0],
-                'hash2': unsubscribe_hash[1],
-                'hash3': unsubscribe_hash[2]
             })
 
         from_email = "subscription@stundenzettel-creator.xyz"
@@ -106,7 +99,7 @@ class Command(BaseCommand):
     def generate_pdf(cls, subscription):
         details = forms.defaults
         details.update({
-            'surnname': subscription.surname,
+            'surname': subscription.surname,
             'first_name': subscription.first_name,
             'year': subscription.next_send_date.year,
             'month': subscription.next_send_date.month,

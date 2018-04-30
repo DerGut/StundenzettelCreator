@@ -6,14 +6,19 @@ from django.core import mail
 from django.core.management import call_command
 from django.template.loader import render_to_string
 from django.test import TestCase, Client
+from freezegun import freeze_time
 
 from StundenzettelCreator import settings
 from creator.models import Subscription
 
+TEST_DATE = "2018-04-30"
+
 
 class UnsubscribeTestCase(TestCase):
     def setUp(self):
-        today = datetime.datetime.today()
+        with freeze_time(TEST_DATE):
+            today = datetime.datetime.today()
+
         self.subscription = Subscription.objects.create(
             email='test@test.com',
             first_name='test',
@@ -26,24 +31,37 @@ class UnsubscribeTestCase(TestCase):
 
         call_command('send_mails')
 
-    def test_unsubscribe(self):
+        self.client = Client()
+
+    def test_correct_unsubscribe_link(self):
         email = mail.outbox[0]
-        match = re.search(r'{}/unsubscribe/([\w.\-]+)[\n<]'.format(settings.HOST_NAME), email.body)
+
+        # Checks that exactly one subscription is in the database and one email has been sent (setUp)
+        self.assertEqual(Subscription.objects.count(), 1)
+        self.assertEqual(len(mail.outbox), 1)
+
+        # Verifies that the email contains an unsubscribe link and retrieves it
+        match = re.search(r'({}/unsubscribe/)([\w.\-]+)[\n<]'.format(settings.HOST_NAME), email.body)
         self.assertTrue(match)
 
-        # Retrieves the match inside the parantheses
-        unsubscribe_token = match.group(1)
+        # Retrieves token from the link
+        unsubscribe_token = match.group(2)
 
+        # Checks the signature of that link
         signer = itsdangerous.URLSafeTimedSerializer(settings.SECRET_KEY)
-        self.assertEqual(
-            signer.loads(unsubscribe_token, max_age=60*60*24*7),
-            self.subscription.pk
-        )
+        with freeze_time(TEST_DATE):
+            self.assertEqual(
+                signer.loads(unsubscribe_token, max_age=60 * 60 * 24 * 7),
+                self.subscription.pk
+            )
 
-        client = Client()
-        response = client.get(match.group(0))
+        # The complete link
+        unsubscribe_link = ''.join(match.group(1, 2))
+
+        # Checks the view
+        with freeze_time(TEST_DATE):
+            response = self.client.get(unsubscribe_link)
         self.assertEqual(response.status_code, 200)
-
         self.assertHTMLEqual(
             response.content.decode(),
             render_to_string(
@@ -51,3 +69,65 @@ class UnsubscribeTestCase(TestCase):
                 context={'status': 'success'}
             )
         )
+
+        # Checks that the subscription has indeed been deleted
+        self.assertEqual(Subscription.objects.count(), 0)
+
+    def test_tampered_unsubscribe_link(self):
+        email = mail.outbox[0]
+
+        # Checks that exactly one subscription is in the database and one email has been sent (setUp)
+        self.assertEqual(Subscription.objects.count(), 1)
+        self.assertEqual(len(mail.outbox), 1)
+
+        # Verifies that the email contains an unsubscribe link and retrieves it
+        match = re.search(r'({}/unsubscribe/)([\w.\-]+)[\n<]'.format(settings.HOST_NAME), email.body)
+        self.assertTrue(match)
+
+        # Gets the complete link and tampers with it
+        unsubscribe_link = ''.join(match.group(1, 2))
+        unsubscribe_link += 'something'
+
+        # Checks the view
+        with freeze_time(TEST_DATE):
+            response = self.client.get(unsubscribe_link)
+        self.assertEqual(response.status_code, 200)
+        self.assertHTMLEqual(
+            response.content.decode(),
+            render_to_string(
+                template_name='creator/subscription_unsubscribe.html',
+                context={'status': 'failure', 'reason': 'tampered'}
+            )
+        )
+
+        # Checks that it failed to unsubscribe
+        self.assertEqual(Subscription.objects.count(), 1)
+
+    def test_expired_unsubscribe_link(self):
+        email = mail.outbox[0]
+
+        # Checks that exactly one subscription is in the database
+        self.assertEqual(Subscription.objects.count(), 1)
+
+        # Verifies that the email contains an unsubscribe link and retrieves it
+        match = re.search(r'({}/unsubscribe/)([\w.\-]+)[\n<]'.format(settings.HOST_NAME), email.body)
+        self.assertTrue(match)
+
+        # The complete link
+        unsubscribe_link = ''.join(match.group(1, 2))
+
+        # Checks the view
+        next_week = datetime.datetime.strptime(TEST_DATE, '%Y-%m-%d') + datetime.timedelta(days=8)
+        with freeze_time(next_week):
+            response = self.client.get(unsubscribe_link)
+            self.assertEqual(response.status_code, 200)
+            self.assertHTMLEqual(
+                response.content.decode(),
+                render_to_string(
+                    template_name='creator/subscription_unsubscribe.html',
+                    context={'status': 'failure', 'reason': 'expired'}
+                )
+            )
+
+        # Checks that it failed to unsubscribe
+        self.assertEqual(Subscription.objects.count(), 1)
