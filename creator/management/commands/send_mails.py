@@ -58,7 +58,7 @@ class Command(BaseCommand):
         
         Bye 
         """.format(first_name=subscription.first_name)
-        html_content = render_to_string('creator/email_subscription.html', {'context': subscription})
+        html_content = render_to_string('creator/subscription_email.html', {'context': subscription})
 
         from_email = "subscription@stundenzettel-creator.xyz"
         recipient_list = [subscription.email]
@@ -78,7 +78,7 @@ class Command(BaseCommand):
     def generate_pdf(cls, subscription):
         details = forms.defaults
         details.update({
-            'name': subscription.name,
+            'surnname': subscription.surname,
             'first_name': subscription.first_name,
             'year': subscription.next_send_date.year,
             'month': subscription.next_send_date.month,

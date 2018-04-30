@@ -3,6 +3,9 @@ import datetime
 import random
 
 import numpy as np
+from django.shortcuts import get_object_or_404
+from django.views import View
+from django.views.generic import DetailView
 from django.views.generic.edit import FormView
 from easy_pdf.views import PDFTemplateView
 import holidays
@@ -148,17 +151,28 @@ class SubscriptionFormView(FormView):
     success_url = '/success/'
 
     def form_valid(self, form):
-        Subscription.objects.create(
-            email=form.email,
-            first_send_date=form.first_send_date,
-            next_send_date=form.first_send_date,
-            hours=form.hours,
-            unit_of_organisation=form.unit_of_organisation,
-            first_name=form.first_name,
-            surname=form.surname
+        subscription = Subscription.objects.create(
+            email=form.cleaned_data['email'],
+            first_send_date=form.cleaned_data['first_send_date'],
+            next_send_date=form.cleaned_data['first_send_date'],
+            hours=form.cleaned_data['hours'],
+            unit_of_organisation=form.cleaned_data['unit_of_organisation'],
+            first_name=form.cleaned_data['first_name'],
+            surname=form.cleaned_data['surname']
         )
 
+        self.request.session['subscription_id'] = subscription.pk
+
         return super().form_valid(form)
+
+
+class SuccessView(DetailView):
+    template_name = 'creator/subscription_success.html'
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(
+            Subscription, pk=self.request.session['subscription_id']
+        )
 
 
 class ResultPdfView(PDFTemplateView):
