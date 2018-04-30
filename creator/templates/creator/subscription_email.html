@@ -7,7 +7,8 @@
 <body>
     Hey {{ first_name }},
 
-    <p>here is your monthly timesheet from <a href="http://www.stundenzettel-creator.xyz">StundenzettelCreator</a>.</p>
+    <p>here is your monthly timesheet from <a href="http://www.stundenzettel-creator.xyz">StundenzettelCreator</a>.
+    You can always unsubscribe by visiting <a href="{% url 'unsubscribe' hash %}">unsubscribe</a></p>
 
     <p>Bye</p>
 </body>

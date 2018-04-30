@@ -2,6 +2,7 @@ import logging
 
 from django.core import mail
 from django.core.management.base import BaseCommand
+from django.core.signing import Signer
 from django.template.loader import render_to_string
 from easy_pdf.rendering import render_to_pdf
 
@@ -14,6 +15,11 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     help = 'Looks up all mail subscriptions in the DB, generates the corresponding PDF and sends off an email'
+
+    def __init__(self):
+        super().__init__()
+
+        self.signer = Signer()
 
     def handle(self, *args, **options):
         logger.info("Starting to send todays email subscriptions")
@@ -45,20 +51,28 @@ class Command(BaseCommand):
         else:
             logger.info('No subscriptions found')
 
-    @classmethod
-    def new_email(cls, subscription, pdf):
+    def new_email(self, subscription, pdf):
         """Send email with pdf as attachment"""
 
         subject = "StundenzettelCreator - Your monthly timesheet"
+
+        unsubscribe_hash = self.signer.sign(subscription.pk)
 
         text_content = """
         Hey {first_name},
         
         here is your monthly timesheet from StundenzettelCreator.
         
+        You can always unsubscribe with this link: http://stundenzettel-creator/unsubscribe/{hash}
+        
         Bye 
-        """.format(first_name=subscription.first_name)
-        html_content = render_to_string('creator/subscription_email.html', {'context': subscription})
+        """.format(first_name=subscription.first_name, hash=unsubscribe_hash)
+        html_content = render_to_string(
+            'creator/subscription_email.html',
+            context={
+                'subscription': subscription,
+                'hash': unsubscribe_hash
+            })
 
         from_email = "subscription@stundenzettel-creator.xyz"
         recipient_list = [subscription.email]

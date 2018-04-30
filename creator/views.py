@@ -1,9 +1,11 @@
 import calendar
 import datetime
+import logging
 import random
 
 import numpy as np
-from django.shortcuts import get_object_or_404
+from django.core import signing
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import DetailView
 from django.views.generic.edit import FormView
 from easy_pdf.views import PDFTemplateView
@@ -11,6 +13,8 @@ import holidays
 
 from creator.forms import DetailsForm, SubscriptionForm
 from creator.models import Subscription
+
+logger = logging.getLogger(__name__)
 
 
 def format_timedelta(td):
@@ -145,7 +149,7 @@ class DetailsFormView(FormView):
 
 
 class SubscriptionFormView(FormView):
-    template_name = 'creator/subscribe.html'
+    template_name = 'creator/subscription_subscribe.html'
     form_class = SubscriptionForm
     success_url = '/success/'
 
@@ -172,6 +176,30 @@ class SuccessView(DetailView):
         return get_object_or_404(
             Subscription, pk=self.request.session['subscription_id']
         )
+
+
+def unsubscribe(request, hash):
+    signer = signing.Signer()
+    try:
+        id = signer.unsign(hash)
+        Subscription.objects.get(pk=id).delete()
+        context = {
+            'status': 'success',
+        }
+    except signing.BadSignature:
+        context = {
+            'status': 'failed',
+            'reason': 'This link is not working properly.'
+        }
+        logger.error('Tampering with unsubscribe link detected')
+    except:
+        context = {
+            'status': 'failed',
+            'reason': 'unknown'
+        }
+
+
+    return render(request, 'creator/subscription_unsubscribe.html', context=context)
 
 
 class ResultPdfView(PDFTemplateView):
