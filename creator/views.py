@@ -4,7 +4,6 @@ import random
 
 import numpy as np
 from django.shortcuts import get_object_or_404
-from django.views import View
 from django.views.generic import DetailView
 from django.views.generic.edit import FormView
 from easy_pdf.views import PDFTemplateView
