@@ -26,6 +26,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 if os.environ.get('DEBUG') == 'True':
     DEBUG = True
 
+# Error notification
+ADMINS = [(os.environ.get('ADMIN_NAME'), os.environ.get('ADMIN_EMAIL'))]
+MANAGERS = [(os.environ.get('ADMIN_NAME'), os.environ.get('ADMIN_EMAIL'))]
+
 ALLOWED_HOSTS = []
 
 
