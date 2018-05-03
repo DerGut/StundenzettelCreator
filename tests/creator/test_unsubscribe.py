@@ -33,6 +33,8 @@ class UnsubscribeTestCase(TestCase):
 
         self.client = Client()
 
+        self.maxDiff = None
+
     def test_correct_unsubscribe_link(self):
         email = mail.outbox[0]
 
@@ -117,7 +119,7 @@ class UnsubscribeTestCase(TestCase):
         unsubscribe_link = ''.join(match.group(1, 2))
 
         # Checks the view
-        next_week = datetime.datetime.strptime(TEST_DATE, '%Y-%m-%d') + datetime.timedelta(days=10)
+        next_week = datetime.datetime.strptime(TEST_DATE, '%Y-%m-%d') + datetime.timedelta(days=11)
         with freeze_time(next_week):
             response = self.client.get(unsubscribe_link)
             self.assertEqual(response.status_code, 200)
