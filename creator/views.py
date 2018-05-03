@@ -186,8 +186,7 @@ def unsubscribe(request, token):
 
     try:
         subscription_id = signer.loads(token, max_age=max_age)
-        # TODO: except no subscription found -> already unsubscribed?
-        Subscription.objects.get(pk=subscription_id).delete()
+        get_object_or_404(Subscription, pk=subscription_id).delete()
         context = {
             'status': 'success',
         }
