@@ -31,10 +31,9 @@ class Subscription(models.Model):
         self.next_send_date = self.next_month(self.first_send_date.day)
         self.save()
 
-    @classmethod
-    def next_month(cls, original_day):
+    def next_month(self, original_day):
         """Computes the same day as first_send_date of the next month or the last day of month if it is shorter"""
-        today = datetime.datetime.today()
+        today = self.next_send_date
         if today.month == 12:
             last_day_of_next_month = calendar.monthrange(year=today.year+1, month=1)[1]
         else:

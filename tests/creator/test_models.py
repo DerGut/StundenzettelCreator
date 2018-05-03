@@ -17,8 +17,9 @@ class SubscriptionTestCase(TestCase):
         # Test some day before 28th for the same year and advancing one year
         with freeze_time("2018-04-07"):
             today = datetime.datetime.today()
+            subscription = Subscription.objects.todays()[0]
             self.assertEqual(
-                Subscription.next_month(today.day),
+                subscription.next_month(today.day),
                 today.replace(month=today.month+1)
             )
 

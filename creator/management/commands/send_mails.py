@@ -104,6 +104,7 @@ class Command(BaseCommand):
             'year': subscription.next_send_date.year,
             'month': subscription.next_send_date.month,
             'hours': subscription.hours,
+            'last_day_of_month': subscription.next_send_date.day - 1,
             'unit_of_organisation': subscription.unit_of_organisation,
         })
 
