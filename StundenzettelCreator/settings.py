@@ -31,6 +31,10 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
+# Error notification
+ADMINS = [(os.environ.get('ADMIN_NAME'), os.environ.get('ADMIN_EMAIL'))]
+MANAGERS = [(os.environ.get('ADMIN_NAME'), os.environ.get('ADMIN_EMAIL'))]
+
 ALLOWED_HOSTS = []
 
 

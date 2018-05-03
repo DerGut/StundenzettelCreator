@@ -5,8 +5,11 @@ services:
   - postgresql
 install:
   - pip install -r requirements.txt
+  - pip install codecov
 before_script:
   - psql -c 'create database timesheets;' -U postgres
 script:
   - make test
   - python manage.py test
+after_success:
+  - codecov
