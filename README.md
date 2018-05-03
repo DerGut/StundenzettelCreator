@@ -1,6 +1,6 @@
 # StundenzettelCreator
 
-[![Build Status](https://travis-ci.org/DerGut/StundenzettelCreator.svg?branch=master)](https://travis-ci.org/DerGut/StundenzettelCreator)
+[![Build Status](https://travis-ci.org/DerGut/StundenzettelCreator.svg?branch=master)](https://travis-ci.org/DerGut/StundenzettelCreator) [![codecov](https://codecov.io/gh/DerGut/StundenzettelCreator/branch/master/graph/badge.svg)](https://codecov.io/gh/DerGut/StundenzettelCreator)
 
 A web interface for the [timesheet generator](https://github.com/pfaion/timesheet_generator) by Patrick Faion.
 
