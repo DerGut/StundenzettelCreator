@@ -12,6 +12,7 @@ from django.views.generic.edit import FormView
 from easy_pdf.views import PDFTemplateView
 import holidays
 
+from creator.exceptions import TimesheetCreationError
 from creator.forms import DetailsForm, SubscriptionForm
 from creator.models import Subscription
 
@@ -76,7 +77,7 @@ def generate_timesheet_data(details):
     while h > 0:
         if len(possible_days) == 0:
             # TODO: Handle this somehow differently - signal the user (pass subscription on to the next day etc)
-            raise RuntimeError("Could not work off all hours with given parameters!")
+            raise TimesheetCreationError("Too many hours until this day of month")
         # select day
         day, weight = weighted_choice(zip(possible_days, weights))
         # if day is already listed, extend working hours there either before or after
@@ -224,8 +225,12 @@ class ResultPdfView(PDFTemplateView):
     template_name = 'creator/timesheet.html'
 
     def get_context_data(self, **kwargs):
-        timesheet_data, header_date, total_hours = generate_timesheet_data(
-            self.request.session.get('details'))
+        try:
+            timesheet_data, header_date, total_hours = generate_timesheet_data(
+                self.request.session.get('details'))
+        except TimesheetCreationError as e:
+            # TODO: Show error view
+            pass
 
         return super(ResultPdfView, self).get_context_data(
             pagesize='A4',

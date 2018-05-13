@@ -1,0 +1,3 @@
+
+class TimesheetCreationError(Exception):
+    pass

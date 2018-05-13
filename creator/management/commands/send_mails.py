@@ -8,6 +8,7 @@ from easy_pdf.rendering import render_to_pdf
 
 from StundenzettelCreator import settings
 from creator import forms
+from creator.exceptions import TimesheetCreationError
 from creator.models import Subscription
 from creator.views import generate_timesheet_data
 
@@ -31,12 +32,16 @@ class Command(BaseCommand):
         emails = []
         for subscription in subscriptions:
             # Generate the pdf for the subscriber and send it off
-            pdf = self.generate_pdf(subscription)
-            emails.append(self.new_email(subscription, pdf))
+            try:
+                pdf = self.generate_pdf(subscription)
+                emails.append(self.new_email(subscription, pdf))
 
-            # TODO: Improve this somehow such that each subscription won't need its own database access
-            # Update the subscription to have a mail sent next month again
-            subscription.update_to_next_month()
+                # TODO: Improve this somehow such that each subscription won't need its own database access
+                # Update the subscription to have a mail sent next month again
+                subscription.update_to_next_month()
+            except TimesheetCreationError as e:
+                # Delays the email to tomorrow
+                pass
 
         # Send off the actual mails
         connection = mail.get_connection()
