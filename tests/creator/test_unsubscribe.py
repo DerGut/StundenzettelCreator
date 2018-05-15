@@ -14,10 +14,20 @@ from creator.models import Subscription
 TEST_DATE = "2018-04-30"
 
 
+class SubscribeClientTestCase(TestCase):
+    # TODO: Implement
+    pass
+
+
+class UnsubscribeClientTestCase(TestCase):
+    # TODO: Implement
+    pass
+
+
 class UnsubscribeTestCase(TestCase):
+    @freeze_time(TEST_DATE)
     def setUp(self):
-        with freeze_time(TEST_DATE):
-            today = datetime.datetime.today()
+        today = datetime.datetime.today()
 
         self.subscription = Subscription.objects.create(
             email='test@test.com',
@@ -119,7 +129,7 @@ class UnsubscribeTestCase(TestCase):
         unsubscribe_link = ''.join(match.group(1, 2))
 
         # Checks the view
-        next_week = datetime.datetime.strptime(TEST_DATE, '%Y-%m-%d') + datetime.timedelta(days=11)
+        next_week = datetime.datetime.strptime(TEST_DATE, '%Y-%m-%d') + datetime.timedelta(days=7, hours=1)
         with freeze_time(next_week):
             response = self.client.get(unsubscribe_link)
             self.assertEqual(response.status_code, 200)
