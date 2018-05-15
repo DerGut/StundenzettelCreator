@@ -16,7 +16,12 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls import url, include
 from django.conf.urls.static import static
+from django.views.generic import TemplateView
 
 urlpatterns = [
-    url(r'^', include('creator.urls'))
+    url(r'^', include('creator.urls')),
+    url(r'^robots\.txt$', TemplateView.as_view(
+        template_name='robots.txt',
+        content_type='text/plain'
+    ))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
