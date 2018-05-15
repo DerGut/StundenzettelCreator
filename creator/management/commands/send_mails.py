@@ -7,10 +7,10 @@ from django.template.loader import render_to_string
 from easy_pdf.rendering import render_to_pdf
 
 from StundenzettelCreator import settings
-from creator import forms
+
 from creator.exceptions import TimesheetCreationError
 from creator.models import Subscription
-from creator.views import generate_timesheet_data
+from creator.timesheet import generate_timesheet_data
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ class Command(BaseCommand):
                 # TODO: Improve this somehow such that each subscription won't need its own database access
                 # Update the subscription to have a mail sent next month again
                 subscription.update_to_next_month()
-            except TimesheetCreationError as e:
+            except TimesheetCreationError:
                 # Delays the email to tomorrow
                 pass
 
@@ -102,8 +102,7 @@ class Command(BaseCommand):
 
     @classmethod
     def generate_pdf(cls, subscription):
-        details = forms.defaults
-        details.update({
+        data = {
             'surname': subscription.surname,
             'first_name': subscription.first_name,
             'year': subscription.next_send_date.year,
@@ -111,15 +110,20 @@ class Command(BaseCommand):
             'hours': subscription.hours,
             'last_day_of_month': subscription.next_send_date.day - 1,
             'unit_of_organisation': subscription.unit_of_organisation,
-        })
-
-        timesheet_data, header_date, total_hours = generate_timesheet_data(details)
-
-        context = {
-            'details': details,
-            'data': timesheet_data,
-            'header_date': header_date,
-            'total_hours': total_hours
         }
 
-        return render_to_pdf(template='creator/timesheet.html', context=context)
+        timesheet_data, header_date, total_hours = generate_timesheet_data(
+            year=data['year'],
+            month=data['month'],
+            fdom=1,
+            ldom=data['last_day_of_month'],
+            hours=data['hours']
+        )
+
+        data.update({
+            'timesheet_data': timesheet_data,
+            'header_date': header_date,
+            'total_hours': total_hours
+        })
+
+        return render_to_pdf(template='creator/timesheet.html', context=data)

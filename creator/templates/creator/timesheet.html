@@ -78,11 +78,11 @@
             <table>
                 <tr>
                     <td>Name, Vorname der Hilfskraft:</td>
-                    <td class="fill-out">{{ details.surname }}, {{ details.first_name }}</td>
+                    <td class="fill-out">{{ surname }}, {{ first_name }}</td>
                 </tr>
                 <tr>
                     <td>Fachbereich/Organisationseinheit:</td>
-                    <td class="fill-out">{{ details.unit_of_organisation }}</td>
+                    <td class="fill-out">{{ unit_of_organisation }}</td>
                 </tr>
                 <tr>
                     <td>Monat/Jahr:</td>
@@ -90,7 +90,7 @@
                 </tr>
                 <tr>
                     <td>Monatsarbeitszeit laut Arbeitsvertrag:</td>
-                    <td class="fill-out">{{ details.hours }}</td>
+                    <td class="fill-out">{{ hours }}</td>
                 </tr>
             </table>
         </div>
@@ -108,7 +108,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for day in data %}
+            {% for day in timesheet_data %}
                 <tr>
                     <td style="text-align: left;padding-left: 5px">{{ day.day }}</td>
                     <td>{{ day.start }}</td>

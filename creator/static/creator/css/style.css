@@ -11,3 +11,11 @@
     margin-right: 8px;
     margin-bottom: 3px;
 }
+
+.errorlist {
+    color: red;
+}
+
+.errorlist.nonfield {
+
+}

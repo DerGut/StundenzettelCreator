@@ -12,12 +12,12 @@
 
                 {{ form.non_field_errors }}
                 <div class="row required-fields">
-                    <div class="col s12 l6 .input-field">
+                    <div class="col s12 l6 input-field">
                         {{ form.first_name.errors }}
                         {{ form.first_name.label_tag }}
                         {{ form.first_name }}
                     </div>
-                    <div class="col s12 l6 .input-field">
+                    <div class="col s12 l6 input-field">
                         {{ form.surname.errors }}
                         {{ form.surname.label_tag }}
                         {{ form.surname }}
@@ -28,17 +28,17 @@
                     <li>
                         <div class="collapsible-header">Advanced</div>
                         <div class="collapsible-body advanced-fields">
-                            <div class=".input-field">
+                            <div class="input-field">
                                 {{ form.unit_of_organisation.errors }}
                                 {{ form.unit_of_organisation.label_tag }}
                                 {{ form.unit_of_organisation }}
                             </div>
-                            <div class=".input-field">
+                            <div class="input-field">
                                 {{ form.hours.errors }}
                                 {{ form.hours.label_tag }}
                                 {{ form.hours }}
                             </div>
-                            <div class=".input-field">
+                            <div class="input-field">
                                 {{ form.days_worked.label_tag }}
                                 {{ form.days_worked.errors }}
                                 {{ form.days_worked }}

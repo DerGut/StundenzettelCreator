@@ -7,10 +7,8 @@ from django.views.generic import DetailView
 from django.views.generic.edit import FormView
 from easy_pdf.views import PDFTemplateView
 
-from creator.exceptions import TimesheetCreationError
 from creator.forms import DetailsForm, SubscriptionForm
 from creator.models import Subscription
-from creator.timesheet import generate_timesheet_data
 
 logger = logging.getLogger(__name__)
 
@@ -21,9 +19,18 @@ class DetailsFormView(FormView):
     success_url = '/result/'
 
     def form_valid(self, form):
-        self.request.session['details'] = form.cleaned_data
+        self.request.session['data'] = form.cleaned_data
 
         return super(DetailsFormView, self).form_valid(form)
+
+
+class ResultPdfView(PDFTemplateView):
+    template_name = 'creator/timesheet.html'
+
+    def get_context_data(self, **kwargs):
+        data = self.request.session.get('data')
+
+        return super(ResultPdfView, self).get_context_data(pagesize='A4', **data)
 
 
 class SubscriptionFormView(FormView):
@@ -94,23 +101,3 @@ def unsubscribe(request, token):
                 pass
 
     return render(request, 'creator/subscription_unsubscribe.html', context=context)
-
-
-class ResultPdfView(PDFTemplateView):
-    template_name = 'creator/timesheet.html'
-
-    def get_context_data(self, **kwargs):
-        try:
-            timesheet_data, header_date, total_hours = generate_timesheet_data(
-                self.request.session.get('details'))
-        except TimesheetCreationError as e:
-            # TODO: Show error view
-            pass
-
-        return super(ResultPdfView, self).get_context_data(
-            pagesize='A4',
-            details=self.request.session.get('details'),
-            data=timesheet_data,
-            header_date=header_date,
-            total_hours=total_hours
-        )

@@ -35,24 +35,25 @@ def weighted_choice(choices):
 
 
 # TODO: Take this logic out of views.py
-def generate_timesheet_data(details):
+def generate_timesheet_data(year, month, fdom, ldom, hours):
     """
     By Patrick Faion <https://github.com/pfaion/timesheet_generator>
     """
-    year = details['year']
-    month = details['month']
-    fdom = details['first_day_of_month']
-    ldom = details['last_day_of_month']
+    days_of_week = [0, 1, 2, 3, 4]
+    start_hour = 8
+    end_hour = 18
+    max_hours = 6
+    state = 'NI'
 
     # get public holidays and length of the month
-    public_holidays = holidays.DE(state=details['state'], years=year)
+    public_holidays = holidays.DE(state=state, years=year)
     days_in_month = calendar.monthrange(year, month)[1]
 
     # check which days are valid, i.e. are specified workdays and not holidays
     valid_days = []
     for day in range(fdom, min(days_in_month, ldom) + 1):
         date = datetime.date(year, month, day)
-        if date not in public_holidays and date.weekday() in details['days_of_week']:
+        if date not in public_holidays and date.weekday() in days_of_week:
             valid_days.append(day)
 
     # Distribute hours over valid days. Use exponential weights (after random shuffle) for days,
@@ -66,10 +67,10 @@ def generate_timesheet_data(details):
     collector = dict()
 
     # possible chunks over the day are from start to end in steps of half-hours
-    chunk_starts = np.arange(details['start_hour'], details['end_hour'], 0.5)
+    chunk_starts = np.arange(start_hour, end_hour, 0.5)
 
     # distribute all hours
-    h = details['hours']
+    h = hours
     while h > 0:
         if len(possible_days) == 0:
             raise TimesheetCreationError("Too many hours for specified range of month")
@@ -79,9 +80,9 @@ def generate_timesheet_data(details):
         if day in collector:
             start, end = collector[day]
             possible_extensions = []
-            if start > details['start_hour']:
+            if start > start_hour:
                 possible_extensions.append('before')
-            if end < (details['end_hour'] - 0.5):
+            if end < (end_hour - 0.5):
                 possible_extensions.append('after')
             extension = random.choice(possible_extensions)
             if extension == 'before':
@@ -89,7 +90,7 @@ def generate_timesheet_data(details):
             if extension == 'after':
                 end += 0.5
             collector[day] = (start, end)
-            if end - start == details['max_hours']:
+            if end - start == max_hours:
                 possible_days.remove(day)
                 weights.remove(weight)
         # if day not yet listed, select random starting chunk
@@ -130,6 +131,6 @@ def generate_timesheet_data(details):
 
     # additional format strings
     header_date = "{:0>2d}/{}".format(month, year)
-    total_hours_formatted = format_timedelta(datetime.timedelta(hours=details['hours']))
+    total_hours_formatted = format_timedelta(datetime.timedelta(hours=hours))
 
     return data, header_date, total_hours_formatted

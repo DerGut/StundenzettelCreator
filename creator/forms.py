@@ -3,27 +3,29 @@ import datetime
 from django import forms
 from django.core.exceptions import ValidationError
 
+from creator.exceptions import TimesheetCreationError
 from creator.fields import DateRangeField
+from creator.timesheet import generate_timesheet_data
 
 today = datetime.date.today()
 defaults = {
     'hours': 23,
     'unit_of_organisation': 'Fachbereich 08',
-    'days_of_week': [0, 1, 2, 3, 4],
-    'start_hour': 8,
-    'end_hour': 18,
-    'max_hours': 6,
-    'state': 'NI',
     'month': today.month,
     'year': today.year,
     'first_day_of_month': 1,
     'last_day_of_month': today.day - 1,
-    'date_range': '{} to {}'.format(
-        datetime.datetime(year=today.year, month=today.month, day=1).strftime('%B %-d'),
-        (today - datetime.timedelta(days=1)).strftime('%B %-d')
-    ),
     'days_worked': None
 }
+
+placeholder_daterange = '{} to {}'.format(
+    datetime.datetime(
+        year=today.year,
+        month=today.month,
+        day=1
+    ).strftime('%B %-d'),
+    (today - datetime.timedelta(days=1)).strftime('%B %-d')
+)
 
 
 class DetailsForm(forms.Form):
@@ -48,15 +50,41 @@ class DetailsForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'daterangepicker',
-            'placeholder': defaults['date_range']
+            'placeholder': placeholder_daterange
         })
     )
 
-    def clean(self):
-        cleaned_data = super().clean()
+    def clean_first_name(self):
+        data = self.cleaned_data['first_name']
 
-        if cleaned_data['days_worked']:
-            fdom, ldom = cleaned_data['days_worked']
+        return data
+
+    def clean_surname(self):
+        data = self.cleaned_data['surname']
+
+        return data
+
+    def clean_unit_of_organisation(self):
+        if self.cleaned_data['unit_of_organisation']:
+            data = self.cleaned_data['unit_of_organisation']
+        else:
+            data = defaults['unit_of_organisation']
+
+        return data
+
+    def clean_hours(self):
+        if self.cleaned_data['hours']:
+            data = self.cleaned_data['hours']
+            if data < 0:
+                raise ValidationError('Please provide a positive number of hours to work', code='invalid')
+        else:
+            data = defaults['hours']
+
+        return data
+
+    def clean_days_worked(self):
+        if self.cleaned_data['days_worked']:
+            fdom, ldom = self.cleaned_data['days_worked']
 
             if fdom.year != ldom.year:
                 raise ValidationError(
@@ -67,36 +95,44 @@ class DetailsForm(forms.Form):
                     'First day and last day are not within the same month',
                     code='invalid')
 
-            cleaned_data['year'] = fdom.year
-            cleaned_data['month'] = fdom.month
-            cleaned_data['first_day_of_month'] = fdom.day
-            cleaned_data['last_day_of_month'] = ldom.day
+            self.cleaned_data['year'] = fdom.year
+            self.cleaned_data['month'] = fdom.month
+            self.cleaned_data['first_day_of_month'] = fdom.day
+            self.cleaned_data['last_day_of_month'] = ldom.day
         else:
-            cleaned_data['year'] = defaults['year']
-            cleaned_data['month'] = defaults['month']
-            cleaned_data['first_day_of_month'] = defaults['first_day_of_month']
-            cleaned_data['last_day_of_month'] = defaults['last_day_of_month']
+            self.cleaned_data['year'] = defaults['year']
+            self.cleaned_data['month'] = defaults['month']
+            self.cleaned_data['first_day_of_month'] = defaults['first_day_of_month']
+            self.cleaned_data['last_day_of_month'] = defaults['last_day_of_month']
 
         # Fix for some weird json serialization error
-        del cleaned_data['days_worked']
+        del self.cleaned_data['days_worked']
 
-        # Set all the default values
-        for field_name, value in cleaned_data.items():
-            if not value:
-                if field_name in defaults.keys():
-                    cleaned_data[field_name] = defaults[field_name]
-                else:
-                    raise ValidationError(
-                        'Please fill out: %(field)s',
-                        params={'field': field_name},
-                        code='empty'
-                    )
+    def _post_clean(self):
+        data = self.cleaned_data
 
-        cleaned_data['state'] = defaults['state']
-        cleaned_data['days_of_week'] = defaults['days_of_week']
-        cleaned_data['start_hour'] = defaults['start_hour']
-        cleaned_data['end_hour'] = defaults['end_hour']
-        cleaned_data['max_hours'] = defaults['max_hours']
+        # TODO: This is stupid. But the add_error method requires a ValidationError object
+        try:
+            try:
+                # Generate the timesheet data
+                timesheet_data, header_date, total_hours = generate_timesheet_data(
+                    data['year'], data['month'], data['first_day_of_month'], data['last_day_of_month'], data['hours']
+                )
+                data.update({
+                    'timesheet_data': timesheet_data,
+                    'header_date': header_date,
+                    'total_hours': total_hours
+                })
+
+                self.cleaned_data = data
+            except KeyError:
+                pass
+            except TimesheetCreationError as tce:
+                raise ValidationError(tce)
+        except ValidationError as ve:
+            self.add_error(None, ve)
+
+        return data
 
 
 class SubscriptionForm(DetailsForm):
