@@ -11,7 +11,7 @@ from freezegun import freeze_time
 from StundenzettelCreator import settings
 from creator.models import Subscription
 
-TEST_DATE = "2018-04-30"
+TEST_DATE = "2018-04-29"
 
 
 class SubscribeClientTestCase(TestCase):
@@ -33,8 +33,6 @@ class UnsubscribeTestCase(TestCase):
             email='test@test.com',
             first_name='test',
             surname='test',
-            first_send_date=today,
-            next_send_date=today,
             hours=5,
             unit_of_organisation='Test'
         )

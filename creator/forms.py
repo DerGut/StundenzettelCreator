@@ -137,9 +137,3 @@ class DetailsForm(forms.Form):
 
 class SubscriptionForm(DetailsForm):
     email = forms.EmailField(required=True)
-    first_send_date = forms.CharField(
-        required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'datepicker',
-        })
-    )

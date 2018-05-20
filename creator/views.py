@@ -41,8 +41,6 @@ class SubscriptionFormView(FormView):
     def form_valid(self, form):
         subscription = Subscription.objects.create(
             email=form.cleaned_data['email'],
-            first_send_date=form.cleaned_data['first_send_date'],
-            next_send_date=form.cleaned_data['first_send_date'],
             hours=form.cleaned_data['hours'],
             unit_of_organisation=form.cleaned_data['unit_of_organisation'],
             first_name=form.cleaned_data['first_name'],

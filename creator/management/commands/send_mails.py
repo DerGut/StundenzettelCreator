@@ -4,13 +4,11 @@ import itsdangerous
 from django.core import mail
 from django.core.management.base import BaseCommand
 from django.template.loader import render_to_string
-from easy_pdf.rendering import render_to_pdf
 
 from StundenzettelCreator import settings
 
 from creator.exceptions import TimesheetCreationError
 from creator.models import Subscription
-from creator.timesheet import generate_timesheet_data
 
 logger = logging.getLogger(__name__)
 
@@ -24,23 +22,22 @@ class Command(BaseCommand):
         self.signer = itsdangerous.URLSafeTimedSerializer(secret_key=settings.SECRET_KEY)
 
     def handle(self, *args, **options):
-        logger.info("Starting to send todays email subscriptions")
-
         # Get subscriptions which next send date is today
-        subscriptions = Subscription.objects.todays()
+        subscriptions = Subscription.objects.due_subscriptions()
+        if not subscriptions:
+            logger.info("No email subscriptions for today")
+            return
+
+        logger.info("Starting to send due email subscriptions")
 
         emails = []
         for subscription in subscriptions:
             # Generate the pdf for the subscriber and send it off
             try:
-                pdf = self.generate_pdf(subscription)
+                pdf = subscription.generate_pdf()
                 emails.append(self.new_email(subscription, pdf))
-
-                # TODO: Improve this somehow such that each subscription won't need its own database access
-                # Update the subscription to have a mail sent next month again
-                subscription.update_to_next_month()
             except TimesheetCreationError:
-                # Delays the email to tomorrow
+                # TODO: Send an email-notification/ warning
                 pass
 
         # Send off the actual mails
@@ -99,31 +96,3 @@ class Command(BaseCommand):
         email.attach_alternative(html_content, 'text/html')
 
         return email
-
-    @classmethod
-    def generate_pdf(cls, subscription):
-        data = {
-            'surname': subscription.surname,
-            'first_name': subscription.first_name,
-            'year': subscription.next_send_date.year,
-            'month': subscription.next_send_date.month,
-            'hours': subscription.hours,
-            'last_day_of_month': subscription.next_send_date.day - 1,
-            'unit_of_organisation': subscription.unit_of_organisation,
-        }
-
-        timesheet_data, header_date, total_hours = generate_timesheet_data(
-            year=data['year'],
-            month=data['month'],
-            fdom=1,
-            ldom=data['last_day_of_month'],
-            hours=data['hours']
-        )
-
-        data.update({
-            'timesheet_data': timesheet_data,
-            'header_date': header_date,
-            'total_hours': total_hours
-        })
-
-        return render_to_pdf(template='creator/timesheet.html', context=data)

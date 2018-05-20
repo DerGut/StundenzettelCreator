@@ -2,24 +2,32 @@ import calendar
 import datetime
 
 from django.db import models
+from easy_pdf.rendering import render_to_pdf
+
+from creator.timesheet import generate_timesheet_data
 
 
 class SubscriptionManager(models.Manager):
-    def todays(self):
-        """Returns a QuerySet of all subscriptions which next send date is due today
+    def due_subscriptions(self):
+        """Returns a QuerySet of all subscriptions if they are due
 
-        Note, this method also returns all subscriptions which next send date has been in the past.
-        This prevents subscriptions from being skipped in case the scheduler fails to execute
-        the send_mail command on a specific day. Returning all subscription <= today, skipped
-        subscriptions would simply be processed on the following day.
+        If today is the next to last day of the current month, all subscriptions are returned. Else,
+        an empty QuerySset will be returned.
         """
-        return super().get_queryset().filter(next_send_date__lte=datetime.datetime.today())
+        today = datetime.datetime.today()
+        last_day_of_month = calendar.monthrange(year=today.year, month=today.month)[1]
+
+        # If today is the next to last day of the month
+        if today.day == last_day_of_month - 1:
+            # Return all the subscriptions
+            return super(SubscriptionManager, self).get_queryset().all()
+        else:
+            # Else return an empty queryset
+            return super(SubscriptionManager, self).none()
 
 
 class Subscription(models.Model):
     email = models.EmailField()
-    first_send_date = models.DateField()
-    next_send_date = models.DateField()
     hours = models.IntegerField()
     unit_of_organisation = models.CharField(max_length=250)
     surname = models.CharField(max_length=300)
@@ -27,33 +35,33 @@ class Subscription(models.Model):
 
     objects = SubscriptionManager()
 
-    def update_to_next_month(self):
-        self.next_send_date = self.next_month(self.first_send_date.day)
-        self.save()
+    def generate_pdf(self):
+        today = datetime.datetime.today()
+        data = {
+            'surname': self.surname,
+            'first_name': self.first_name,
+            'year': today.year,
+            'month': today.month,
+            'hours': self.hours,
+            'last_day_of_month': calendar.monthrange(today.year, today.month)[1],
+            'unit_of_organisation': self.unit_of_organisation,
+        }
 
-    def next_month(self, original_day):
-        """Computes the same day as first_send_date of the next month or the last day of month if it is shorter"""
-        today = self.next_send_date
-        if today.month == 12:
-            last_day_of_next_month = calendar.monthrange(year=today.year+1, month=1)[1]
-        else:
-            last_day_of_next_month = calendar.monthrange(year=today.year, month=today.month+1)[1]
+        timesheet_data, header_date, total_hours = generate_timesheet_data(
+            year=data['year'],
+            month=data['month'],
+            fdom=1,
+            ldom=data['last_day_of_month'],
+            hours=data['hours']
+        )
 
-        # Decide whether to use the same day as first_send_date next month or the last_day_of_next_month
-        if original_day <= last_day_of_next_month:
-            day = original_day
-        else:
-            day = last_day_of_next_month
+        data.update({
+            'timesheet_data': timesheet_data,
+            'header_date': header_date,
+            'total_hours': total_hours
+        })
 
-        # Get the next month + year
-        if today.month == 12:
-            year = today.year + 1
-            month = 1
-        else:
-            year = today.year
-            month = today.month + 1
-
-        return datetime.datetime(year=year, month=month, day=day)
+        return render_to_pdf(template='creator/timesheet.html', context=data)
 
     def __str__(self):
-        return '{} - day {}'.format(self.email, self.next_send_date)
+        return self.email
