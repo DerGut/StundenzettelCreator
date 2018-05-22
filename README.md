@@ -4,7 +4,7 @@
 
 A web interface for the [timesheet generator](https://github.com/pfaion/timesheet_generator) by Patrick Faion.
 
-Visit [the web site](https://quiet-shore-44830.herokuapp.com) to have your Stundenzettel be automatically created.
+Visit [the web site](http://www.stundenzettel-creator.xyz) to have your Stundenzettel be automatically created.
 
 ## Installation
 In order to install StundenzettelCreator locally simply follow the steps below.
