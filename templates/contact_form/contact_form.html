@@ -1,0 +1,45 @@
+{% extends "creator/base.html" %}
+
+{% block container %}
+    <h2>Contact</h2>
+
+    <br/>
+
+    <div class="row">
+        <div class="col s 12 l9">
+            <form method="post" class="details-form">
+                {% csrf_token %}
+
+                {{ form.non_field_errors }}
+                <div class="row required-fields">
+                    <div class="input-field">
+                        {{ form.name.errors }}
+                        {{ form.name.label_tag }}
+                        {{ form.name }}
+                    </div>
+                </div>
+                <div class="row required-fields">
+                    <div class="input-field">
+                        {{ form.email.errors }}
+                        {{ form.email.label_tag }}
+                        {{ form.email }}
+                    </div>
+                </div>
+                <div class="row required-fields">
+                    <div class="input-field">
+                        {{ form.body.errors }}
+                        <textarea
+                                required
+                                name="{{ form.body.html_name }}"
+                                id="{{ form.body.id_for_label }}"
+                                class="materialize-textarea"
+                                cols="40" rows="10"></textarea>
+                        {{ form.body.label_tag }}
+                    </div>
+                </div>
+
+                <button type="submit" class="waves-effect waves-light btn">Send!</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

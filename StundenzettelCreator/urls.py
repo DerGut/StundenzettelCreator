@@ -20,8 +20,9 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     url(r'^', include('creator.urls')),
+    url(r'^contact/', include('contact_form.urls')),
     url(r'^robots\.txt$', TemplateView.as_view(
         template_name='robots.txt',
         content_type='text/plain'
-    ))
+    )),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

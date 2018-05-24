@@ -1,0 +1,7 @@
+user: {{ name }}
+email: {{ email }}
+
+Sent the message:
+------------------------
+
+{{ body }}
