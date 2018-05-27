@@ -1,3 +1,5 @@
+/* global M */
+
 $(document).ready(function(){
     // Initialize the date picker and advanced section collapsible
     let datepickerOptions = {
