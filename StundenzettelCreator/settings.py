@@ -43,7 +43,8 @@ else:
     ADMINS = [(os.environ.get('ADMIN_NAME'), os.environ.get('ADMIN_EMAIL'))]
     MANAGERS = [(os.environ.get('ADMIN_NAME'), os.environ.get('ADMIN_EMAIL'))]
 
-ALLOWED_HOSTS = []
+if DEBUG:
+    ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -157,11 +158,10 @@ if PRODUCTION:
     X_FRAME_OPTIONS = 'DENY'
 
     # Activate Django-Heroku.
-    import django_heroku
+    if os.environ.get('HEROKU', False) == 'True':
+        import django_heroku
+        django_heroku.settings(locals())
 
-    django_heroku.settings(locals())
-
-if DEBUG:
-    HOST_NAME = 'http://127.0.0.1:8000'
-else:
     HOST_NAME = 'http://www.stundenzettel-creator.xyz'
+else:
+    HOST_NAME = 'http://127.0.0.1:8000'
