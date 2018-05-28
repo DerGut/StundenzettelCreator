@@ -27,8 +27,6 @@ class UnsubscribeClientTestCase(TestCase):
 class UnsubscribeTestCase(TestCase):
     @freeze_time(TEST_DATE)
     def setUp(self):
-        today = datetime.datetime.today()
-
         self.subscription = Subscription.objects.create(
             email='test@test.com',
             first_name='test',

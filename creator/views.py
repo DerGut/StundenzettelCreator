@@ -7,7 +7,7 @@ from django.views.generic import DetailView
 from django.views.generic.edit import FormView
 from easy_pdf.views import PDFTemplateView
 
-from creator.forms import DetailsForm, SubscriptionForm
+from creator.forms import TimesheetDetailsForm, SubscriptionForm
 from creator.models import Subscription
 
 logger = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class DetailsFormView(FormView):
     template_name = 'creator/home.html'
-    form_class = DetailsForm
+    form_class = TimesheetDetailsForm
     success_url = '/result/'
 
     def form_valid(self, form):

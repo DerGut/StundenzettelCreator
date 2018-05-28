@@ -28,7 +28,7 @@ placeholder_daterange = '{} to {}'.format(
 )
 
 
-class DetailsForm(forms.Form):
+class TimesheetDetailsForm(forms.Form):
     # Important details
     surname = forms.CharField(
         widget=forms.TextInput(attrs={'placeholder': '<your name>'})
@@ -135,5 +135,5 @@ class DetailsForm(forms.Form):
         return data
 
 
-class SubscriptionForm(DetailsForm):
+class SubscriptionForm(TimesheetDetailsForm):
     email = forms.EmailField(required=True)
