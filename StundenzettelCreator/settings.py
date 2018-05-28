@@ -43,6 +43,8 @@ else:
     ADMINS = [(os.environ.get('ADMIN_NAME'), os.environ.get('ADMIN_EMAIL'))]
     MANAGERS = [(os.environ.get('ADMIN_NAME'), os.environ.get('ADMIN_EMAIL'))]
 
+DEFAULT_FROM_EMAIL = 'StundenzettelCreator <notification@stundenzettel-creator.xyz>'
+
 if DEBUG:
     ALLOWED_HOSTS = []
 
