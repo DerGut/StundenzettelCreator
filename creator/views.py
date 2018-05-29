@@ -52,7 +52,7 @@ class SubscriptionFormView(FormView):
         return super().form_valid(form)
 
 
-class SuccessView(DetailView):
+class SubscriptionSuccessView(DetailView):
     template_name = 'creator/subscription_success.html'
 
     def get_object(self, queryset=None):

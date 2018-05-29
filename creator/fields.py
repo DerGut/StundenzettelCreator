@@ -26,7 +26,7 @@ class DateRangeField(BaseTemporalField):
             date1 = super(DateRangeField, self).to_python(date1)
             date2 = super(DateRangeField, self).to_python(date2)
         except ValidationError:
-            raise ValidationError(self.error_messages['invalid'], code='invalid')
+            raise ValidationError('Date range format invalid. Try \'Y-m-d to Y-m-d\'', code='invalid')
 
         return date1, date2
 
