@@ -51,4 +51,30 @@
             </form>
         </div>
     </div>
+
+    <br/>
+
+    <div class="row">
+        <div class="col s 12 l9">
+            <h5>How to use TimesheetCreator:</h5>
+            <p>
+                TimesheetCreator will automatically schedule your working hours for you,
+                based on information about weekends and public holidays in Lower Saxony.
+                <br/>
+                The input you provide to the form above will render a pdf that you can then download.
+            </p>
+            <p>
+                The advanced section lets you specify more detailed information such as
+                the exact dates you have worked, the amount of hours worked or
+                the name of the institute you are employed at.
+            </p>
+            <div class="divider"></div>
+            <h5>Subscription function:</h5>
+            <p>
+                You can also have your timesheet be automatically created once per month and sent to you via email.
+                This way you don't ever need to think about it again <a href="{% url "subscribe" %}">&rarr; Subscribe</a>.
+            </p>
+        </div>
+    </div>
+
 {% endblock %}
