@@ -28,7 +28,8 @@ placeholder_daterange = '{} to {}'.format(
 )
 
 
-class TimesheetDetailsForm(forms.Form):
+class TimesheetForm(forms.Form):
+    """Base form for getting all details for generating a timesheet"""
     # Important details
     surname = forms.CharField(
         widget=forms.TextInput(attrs={'placeholder': '<your name>'})
@@ -45,13 +46,6 @@ class TimesheetDetailsForm(forms.Form):
     hours = forms.IntegerField(
         required=False,
         widget=forms.NumberInput(attrs={'placeholder': defaults['hours']})
-    )
-    days_worked = DateRangeField(
-        required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'daterangepicker',
-            'placeholder': placeholder_daterange
-        })
     )
 
     def clean_first_name(self):
@@ -82,6 +76,17 @@ class TimesheetDetailsForm(forms.Form):
 
         return data
 
+
+class TimesheetWithDateRangeForm(TimesheetForm):
+    """Form for the normal timesheet creation feature"""
+    days_worked = DateRangeField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'daterangepicker',
+            'placeholder': placeholder_daterange
+        })
+    )
+
     def clean_days_worked(self):
         if self.cleaned_data['days_worked']:
             fdom, ldom = self.cleaned_data['days_worked']
@@ -111,7 +116,7 @@ class TimesheetDetailsForm(forms.Form):
     def _post_clean(self):
         data = self.cleaned_data
 
-        # TODO: This is stupid. But the add_error method requires a ValidationError object
+        # This is stupid. But the add_error method requires a ValidationError object
         try:
             try:
                 # Generate the timesheet data
@@ -135,5 +140,6 @@ class TimesheetDetailsForm(forms.Form):
         return data
 
 
-class SubscriptionForm(TimesheetDetailsForm):
+class SubscriptionForm(TimesheetForm):
+    """Form for the subscription feature"""
     email = forms.EmailField(required=True)

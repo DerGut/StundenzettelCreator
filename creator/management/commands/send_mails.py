@@ -37,7 +37,7 @@ class Command(BaseCommand):
                 pdf = subscription.generate_pdf()
                 emails.append(self.new_email(subscription, pdf))
             except TimesheetCreationError:
-                # TODO: Send an email-notification/ warning
+                # TODO: Send an email-notification/ warning #29
                 pass
 
         # Send off the actual mails

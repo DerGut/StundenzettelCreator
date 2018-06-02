@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from creator.forms import TimesheetDetailsForm, SubscriptionForm
+from creator.forms import TimesheetWithDateRangeForm, SubscriptionForm
 
 
 class TimesheetDetailsFormTestCase(TestCase):
@@ -14,27 +14,27 @@ class TimesheetDetailsFormTestCase(TestCase):
         }
 
     def test_valid_input_data(self):
-        form = TimesheetDetailsForm(data=self.valid_data)
+        form = TimesheetWithDateRangeForm(data=self.valid_data)
 
         self.assertTrue(form.is_valid())
 
     def test_no_surname_provided(self):
         del self.valid_data['surname']
-        form = TimesheetDetailsForm(data=self.valid_data)
+        form = TimesheetWithDateRangeForm(data=self.valid_data)
 
         self.assertFalse(form.is_valid())
         self.assertTrue(form.has_error('surname'))
 
     def test_no_first_name_provided(self):
         del self.valid_data['first_name']
-        form = TimesheetDetailsForm(data=self.valid_data)
+        form = TimesheetWithDateRangeForm(data=self.valid_data)
 
         self.assertFalse(form.is_valid())
         self.assertTrue(form.has_error('first_name'))
 
     def test_negative_hours(self):
         self.valid_data['hours'] = -23
-        form = TimesheetDetailsForm(data=self.valid_data)
+        form = TimesheetWithDateRangeForm(data=self.valid_data)
 
         self.assertFalse(form.is_valid())
         self.assertTrue(form.has_error('hours'))
@@ -45,7 +45,7 @@ class TimesheetDetailsFormTestCase(TestCase):
 
     def test_too_many_hours_for_days_worked(self):
         self.valid_data['hours'] = 1000
-        form = TimesheetDetailsForm(data=self.valid_data)
+        form = TimesheetWithDateRangeForm(data=self.valid_data)
 
         self.assertFalse(form.is_valid())
         non_form_errors = form.non_field_errors()
@@ -57,7 +57,7 @@ class TimesheetDetailsFormTestCase(TestCase):
 
     def test_working_days_range_not_in_same_month(self):
         self.valid_data['days_worked'] = '2018-05-15 to 2018-06-15'
-        form = TimesheetDetailsForm(data=self.valid_data)
+        form = TimesheetWithDateRangeForm(data=self.valid_data)
 
         self.assertFalse(form.is_valid())
         self.assertTrue(form.has_error('days_worked'))
@@ -68,7 +68,7 @@ class TimesheetDetailsFormTestCase(TestCase):
 
     def test_working_days_range_not_in_same_year(self):
         self.valid_data['days_worked'] = '2018-05-01 to 2019-05-30'
-        form = TimesheetDetailsForm(data=self.valid_data)
+        form = TimesheetWithDateRangeForm(data=self.valid_data)
 
         self.assertFalse(form.is_valid())
         self.assertTrue(form.has_error('days_worked'))
@@ -79,7 +79,7 @@ class TimesheetDetailsFormTestCase(TestCase):
 
     def test_working_days_range_not_in_same_year_and_month(self):
         self.valid_data['days_worked'] = '2018-12-15 to 2019-01-15'
-        form = TimesheetDetailsForm(data=self.valid_data)
+        form = TimesheetWithDateRangeForm(data=self.valid_data)
 
         self.assertFalse(form.is_valid())
         self.assertTrue(form.has_error('days_worked'))
