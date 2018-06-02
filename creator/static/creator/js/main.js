@@ -13,7 +13,7 @@ $(document).ready(function(){
     $(".collapsible").collapsible();
 
     // Reopen the advanced section if the validation returned an error
-    if ($(".advanced-fields").find(".errorlist").length) {
+    if ($(".advanced-fields").find(".errorlist").length || $("form").find(".errorlist.nonfield").length) {
         M.Collapsible.getInstance($(".collapsible")).open(0);
     }
 });
