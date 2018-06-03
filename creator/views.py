@@ -2,7 +2,7 @@ import logging
 
 import itsdangerous
 from django.conf import settings
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import DetailView
 from django.views.generic.edit import FormView
 from easy_pdf.views import PDFTemplateView
@@ -28,9 +28,18 @@ class ResultPdfView(PDFTemplateView):
     template_name = 'creator/timesheet.html'
 
     def get_context_data(self, **kwargs):
-        data = self.request.session.get('data')
+        try:
+            data = self.request.session['data']
+        except KeyError:
+            return None
 
         return super(ResultPdfView, self).get_context_data(pagesize='A4', **data)
+
+    def render_to_response(self, context, **response_kwargs):
+        if not context:
+            return redirect('index')
+
+        return super(ResultPdfView, self).render_to_response(context, **response_kwargs)
 
 
 class SubscriptionFormView(FormView):

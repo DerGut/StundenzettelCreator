@@ -6,11 +6,19 @@ client = Client()
 
 
 class CreateTimesheetTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
     def test_details_form_view(self):
         response = client.get(reverse('index'))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, template_name='creator/home.html')
+
+    def test_result_pdf_to_index_redirect(self):
+        response = client.get(reverse('result'))
+
+        self.assertRedirects(response, reverse('index'), status_code=302, target_status_code=200)
 
     def test_result_pdf_view(self):
         response = client.post(reverse('index'), data={
@@ -21,8 +29,7 @@ class CreateTimesheetTestCase(TestCase):
 
         self.assertRedirects(response, reverse('result'), status_code=302, target_status_code=200)
 
-        factory = RequestFactory()
-        request = factory.get(reverse('result'))
+        request = self.factory.get(reverse('result'))
         response = render_to_pdf_response(request, 'creator/timesheet.html', context={
             'surname': 'Testname',
             'first_name': 'Test',
