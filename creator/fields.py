@@ -21,10 +21,13 @@ class DateRangeField(BaseTemporalField):
         if value in self.empty_values:
             return None
 
-        date1, date2 = value.split(' to ')
         try:
+            date1, date2 = value.split(' to ')
+
             date1 = super(DateRangeField, self).to_python(date1)
             date2 = super(DateRangeField, self).to_python(date2)
+        except ValueError:
+            raise ValidationError('Date range format invalid. Two dates are needed.')
         except ValidationError:
             raise ValidationError('Date range format invalid. Try \'Y-m-d to Y-m-d\'', code='invalid')
 
