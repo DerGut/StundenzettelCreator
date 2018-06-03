@@ -15,16 +15,20 @@ class SubscriptionManager(models.Manager):
         an empty QuerySset will be returned.
         """
         today = datetime.datetime.today()
-        last_day_of_month = calendar.monthrange(year=today.year, month=today.month)[1]
 
         # If today is the next to last day of the month
-        if today.day == last_day_of_month - 1:
+        if today.day == self.date_of_subscription(today).day:
             # Return all the subscriptions
             return super(SubscriptionManager, self).get_queryset().all()
         else:
             # Else return an empty queryset
             return super(SubscriptionManager, self).none()
 
+    @staticmethod
+    def date_of_subscription(today):
+        """Returns the next to last day of the current month as a date object"""
+        last_day_of_month = calendar.monthrange(year=today.year, month=today.month)[1]
+        return datetime.date(today.year, today.month, last_day_of_month - 1)
 
 class Subscription(models.Model):
     email = models.EmailField()

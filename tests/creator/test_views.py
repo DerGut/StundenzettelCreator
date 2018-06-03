@@ -118,6 +118,11 @@ class SubscribeTestCase(TestCase):
 
         self.assertRedirects(response, reverse('success'), status_code=302, target_status_code=200)
 
+    def test_subscription_success_view_redirection(self):
+        response = client.get(reverse('success'))
+
+        self.assertRedirects(response, reverse('subscribe'), status_code=302, target_status_code=200)
+
     def test_invalid_form_no_surname(self):
         response = client.post(reverse('subscribe'), data={
             'first_name': 'Test',

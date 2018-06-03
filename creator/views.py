@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 import itsdangerous
@@ -68,6 +69,20 @@ class SubscriptionSuccessView(DetailView):
         return get_object_or_404(
             Subscription, pk=self.request.session['subscription_id']
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+
+        date = Subscription.objects.date_of_subscription(datetime.datetime.today())
+        context.update({'next_timesheet': date.strftime('%a %-d of %B')})
+
+        return context
+
+    def get(self, request, *args, **kwargs):
+        if not self.request.session.get('subscription_id'):
+            return redirect('subscribe')
+
+        return super().get(request, *args, **kwargs)
 
 
 def unsubscribe(request, token):
