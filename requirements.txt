@@ -11,3 +11,4 @@ numpy==1.14.2
 freezegun==0.3.10
 itsdangerous==0.24
 django-contact-form==1.5
+newrelic==3.2.1.93
