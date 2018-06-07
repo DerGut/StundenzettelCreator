@@ -154,6 +154,9 @@ else:
         EMAIL_PORT = 587
         EMAIL_USE_TLS = True
 
+# Monitoring
+SNITCH_URL = os.environ.get('SNITCH_URL')
+
 if PRODUCTION:
     # Deploy stuff
     SECURE_BROWSER_XSS_FILTER = True

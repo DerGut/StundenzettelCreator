@@ -1,6 +1,7 @@
 import logging
 
 import itsdangerous
+import requests
 from django.core import mail
 from django.core.management.base import BaseCommand
 from django.template.loader import render_to_string
@@ -45,14 +46,26 @@ class Command(BaseCommand):
         mails_sent = connection.send_messages(emails)
         connection.close()
 
+        snitch_data = {'m': ''}
+
         # Logging
         num_subscriptions = subscriptions.count()
         if num_subscriptions > 0:
-            logger.info('Sent off {} mails successfully'.format(mails_sent))
+            msg = 'Sent off {} mails successfully'.format(mails_sent)
+            logger.info(msg)
+            snitch_data['m'] += msg
             if num_subscriptions - mails_sent > 0:
-                logger.error('Failed to send {} mails'.format(num_subscriptions - mails_sent))
+                msg = 'Failed to send {} mails'.format(num_subscriptions - mails_sent)
+                logger.error(msg)
+                snitch_data['m'] += (msg)
         else:
-            logger.info('No subscriptions found')
+            msg = 'No subscriptions found'
+            logger.info(msg)
+            snitch_data += msg
+
+        # Dead mans snitch
+        if settings.SNITCH_URL:
+            requests.post(settings.SNITCH_URL, data=snitch_data)
 
     def new_email(self, subscription, pdf):
         """Send email with pdf as attachment"""
