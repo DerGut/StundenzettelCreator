@@ -26,7 +26,11 @@ class Command(BaseCommand):
         # Get subscriptions which next send date is today
         subscriptions = Subscription.objects.due_subscriptions()
         if not subscriptions:
+            if settings.SNITCH_URL:
+                requests.post(settings.SNITCH_URL, data={'m': 'Nothing to send'})
+
             logger.info("No email subscriptions for today")
+
             return
 
         logger.info("Starting to send due email subscriptions")
@@ -46,26 +50,18 @@ class Command(BaseCommand):
         mails_sent = connection.send_messages(emails)
         connection.close()
 
-        snitch_data = {'m': ''}
-
         # Logging
         num_subscriptions = subscriptions.count()
         if num_subscriptions > 0:
-            msg = 'Sent off {} mails successfully'.format(mails_sent)
-            logger.info(msg)
-            snitch_data['m'] += msg
+            logger.info('Sent off {} mails successfully'.format(mails_sent))
             if num_subscriptions - mails_sent > 0:
-                msg = 'Failed to send {} mails'.format(num_subscriptions - mails_sent)
-                logger.error(msg)
-                snitch_data['m'] += (msg)
+                logger.error('Failed to send {} mails'.format(num_subscriptions - mails_sent))
         else:
-            msg = 'No subscriptions found'
-            logger.info(msg)
-            snitch_data += msg
+            logger.info('No subscriptions found')
 
         # Dead mans snitch
         if settings.SNITCH_URL:
-            requests.post(settings.SNITCH_URL, data=snitch_data)
+            requests.post(settings.SNITCH_URL, data={'m': 'Sent off {} emails'.format(mails_sent)})
 
     def new_email(self, subscription, pdf):
         """Send email with pdf as attachment"""
