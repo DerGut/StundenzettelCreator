@@ -12,4 +12,4 @@ freezegun==0.3.10
 itsdangerous==0.24
 django-contact-form==1.5
 newrelic==3.2.1.93
-requests==2.18.4
+requests==2.20.0
