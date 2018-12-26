@@ -1,1 +1,1 @@
-web: newrelic-admin run-program gunicorn StundenzettelCreator.wsgi
+web: gunicorn StundenzettelCreator.wsgi
