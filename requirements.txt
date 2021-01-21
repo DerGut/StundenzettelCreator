@@ -1,4 +1,4 @@
-django>=1.11.18
+django~=1.11.18
 psycopg2==2.7.1
 psycopg2-binary==2.7.4
 django_heroku==0.3.1
