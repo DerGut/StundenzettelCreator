@@ -12,10 +12,7 @@
     "SECRET_KEY": {
       "required": true
     },
-    "SENDGRID_PASSWORD": {
-      "required": true
-    },
-    "SENDGRID_USERNAME": {
+    "SENDGRID_API_KEY": {
       "required": true
     }
   },

@@ -142,15 +142,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 else:
-    if not os.environ.get('SENDGRID_USERNAME') and not os.environ.get('SENDGRID_PASSWORD'):
-        logger.error("The environment variables SENDGRID_USERNAME and SENDGRID_PASSWORD "
-                     "are not set. Please provision a free sendgrid add-on. Otherwise the "
+    if not os.environ.get('SENDGRID_API_KEY'):
+        logger.error("The environment variable SENDGRID_API_KEY "
+                     "is not set. Please provision a free sendgrid add-on. Otherwise the "
                      "email subscription and contact features will not function properly.")
         EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     else:
         EMAIL_HOST = 'smtp.sendgrid.net'
-        EMAIL_HOST_USER = os.environ.get('SENDGRID_USERNAME')
-        EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_PASSWORD')
+        EMAIL_HOST_USER = 'apikey'
+        EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
         EMAIL_PORT = 587
         EMAIL_USE_TLS = True
 
